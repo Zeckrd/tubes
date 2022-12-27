@@ -1,0 +1,169 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+// Forward declarations for our linked list classes
+class Location;
+class Item;
+class Character;
+class StatsPlayer;
+class StatsMonster;
+
+// A class to represent an item in the game world
+class Item {
+ public:
+  string name;  // The name of the item
+  string description;  // A description of the item
+  Item* next;  // A pointer to the next item in the linked list
+
+  // A constructor to initialize the item
+  Item(string name, string description)
+      : name(name), description(description), next(nullptr) {}
+};
+
+//A class to represent a stats from player
+class StatsPlayer {
+    int exp;
+    int health;
+    int mana;
+};
+
+//A class to represent a stats from monster
+class StatsMonster {
+    int health;
+};
+
+// A class to represent a location in the game world
+class Location {
+ public:
+  string name;  // The name of the location
+  string description;  // A description of the location
+  Location* north;  // Pointers to neighboring locations
+  Location* south;
+  Location* east;
+  Location* west;
+  Item* items;  // A pointer to the first item in the linked list of items at this location
+  Character* characters;  // A pointer to the first character in the linked list of characters at this location
+
+  // A constructor to initialize the location
+  Location(string name, string description)
+      : name(name),
+        description(description),
+        north(nullptr),
+        south(nullptr),
+        east(nullptr),
+        west(nullptr),
+        items(nullptr),
+        characters(nullptr) {}
+};
+
+// A class to represent a character in the game world
+class Character {
+ public:
+  string name;  // The name of the character
+  string description;  // A description of the character
+  Location* location;  // The location where the character is currently located
+  Character* next;  // A pointer to the next character in the linked list
+
+  // A constructor to initialize the character
+  Character(string name, string description, Location* location)
+      : name(name), description(description), location(location), next(nullptr) {}
+};
+
+int main() {
+  // Create some locations
+  Location* forest = new Location("Forest", "A dense forest filled with tall trees and strange noises.");
+  Location* village = new Location("Village", "A small village with friendly people and cozy houses.");
+  Location* castle = new Location("Castle", "A grand castle with high walls and a drawbridge.");
+
+  // Link the locations together
+  forest->south = village;
+  village->north = forest;
+  village->east = castle;
+  castle->west = village;
+
+  // Create some characters
+  Character* knight = new Character("Knight", "A brave knight in shining armor.", castle);
+  Character* peasant = new Character("Peasant", "A poor peasant working in the fields.", village);
+  Character* dragon = new Character("Dragon", "A fierce dragon hoarding treasure in its lair.", forest);
+
+  // Add the characters to the linked lists of characters at their respective locations
+  knight->next = castle->characters;
+  castle->characters = knight;
+  dragon->next = forest->characters;
+  forest->characters = dragon;
+  peasant->next = village->characters;
+  village->characters = peasant;
+// Create some items
+  Item* sword = new Item("Sword", "A sharp sword with a gleaming blade.");
+  Item* potion = new Item("Potion", "A glowing potion that seems to shimmer with magical energy.");
+  Item* gold = new Item("Gold", "A pile of shiny gold coins.");
+
+  // Add the items to the linked lists of items at their respective locations
+  sword->next = village->items;
+  village->items = sword;
+  potion->next = forest->items;
+  forest->items = potion;
+  gold->next = castle->items;
+  castle->items = gold;
+
+  // Set the player's initial location
+  Location* player_location = village;
+
+  // Main game loop
+  while (true) {
+    // Print the player's current location
+    cout << "You are currently in the " << player_location->name << "." << endl;
+    cout << player_location->description << endl;
+
+    // Print the names of any characters at the player's location
+    if (player_location->characters != nullptr) {
+      cout << "Characters at this location:" << endl;
+      Character* character = player_location->characters;
+      while (character != nullptr) {
+        cout << "  " << character->name << endl;
+        character = character->next;
+      }
+    }
+
+    // Print the names of any items at the player's location
+    if (player_location->items != nullptr) {
+      cout << "Items at this location:" << endl;
+      Item* item = player_location->items;
+      while (item != nullptr) {
+        cout << "  " << item->name << endl;
+        item = item->next;
+      }
+    }
+
+    // Print the player's options
+    cout << "What would you like to do?" << endl;
+    cout << "  (N)orth" << endl;
+    cout << "  (S)outh" << endl;
+    cout << "  (E)ast" << endl;
+    cout << "  (W)est" << endl;
+    cout << "  (Q)uit" << endl;
+
+    // Read the player's input
+    string input;
+    cin >> input;
+
+    // Update the player's location based on the input
+    if (input == "N" && player_location->north != nullptr) {
+      player_location = player_location->north;
+    } else if (input == "S" && player_location->south != nullptr) {
+      player_location = player_location->south;
+    } else if (input == "E" && player_location->east != nullptr) {
+      player_location = player_location->east;
+    } else if (input == "W" && player_location->west != nullptr) {
+      player_location = player_location->west;
+    } else if (input == "Q") {
+break;
+    } else {
+      cout << "Invalid input." << endl;
+    }
+  }
+
+  return 0;
+}
